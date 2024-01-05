@@ -1,6 +1,6 @@
 ## ggplot
 
-## matplotlib
+## matplotlib+scienceplots
 
 ## pyecharts/echarts
 
