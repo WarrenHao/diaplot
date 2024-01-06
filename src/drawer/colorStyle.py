@@ -2,7 +2,7 @@ from typing import Any
 import requests
 from dataclasses import dataclass
 from typing import *
-from bs4 import BeautifulSoup
+import random
 
 
 NColorScheme = ['NPG', 'AAAS', 'NEJM', 'LANCET', 'JAMA', 'JCO', 'UCSCGB', 'D3', 'LOCUSZOOM', 'IGV']
@@ -41,9 +41,17 @@ class ColorScheme:
 
 
     @staticmethod
-    def get_random_color_from_adobe():
-        url = 'https://color.adobe.com/zh/create/color-wheel'
-        r = requests.get(url)
-        soup = BeautifulSoup(r.text, 'html.parser')
-        color = soup.find_all('div', class_='color-hex')
-        return color[0].text, color[1].text, color[2].text, color[3].text, color[4].text, color[5].text
+    def get_random_color_from_aicolor() -> list:
+        url = 'https://jsuifmbqefnxytqwmaoy.supabase.co/rest/v1/palette?select=*&order=likes.desc'
+        res = requests.get(url, headers={
+            'Content-Type': 'application/json',
+            'Prefer': 'safe',
+            'Apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzdWlmbWJxZWZueHl0cXdtYW95Iiwicm9sZSI6ImFub24iLCJpYXQiOjE2NzcwMjE1ODMsImV4cCI6MTk5MjU5NzU4M30.09YStNMblCJmFgb9BvpbrGEv4vVyePe3zSI7KeVzVTU'
+
+        })
+        response_json = res.json()
+        color_list = list()
+        for i in response_json:
+            color_list.append([i['bg'], i['bgFocus'], i['primaryClear'], i['primaryDull'], i['primaryVisible'], i['accentClear'], i['accentDull'], i['clear'], i['dull'], i['duller']])
+            
+        return random.choice(color_list)
