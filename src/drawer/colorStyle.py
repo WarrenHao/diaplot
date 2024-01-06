@@ -2,7 +2,7 @@ from typing import Any
 import requests
 from dataclasses import dataclass
 from typing import *
-from dataclasses import field
+from bs4 import BeautifulSoup
 
 
 NColorScheme = ['NPG', 'AAAS', 'NEJM', 'LANCET', 'JAMA', 'JCO', 'UCSCGB', 'D3', 'LOCUSZOOM', 'IGV']
@@ -38,3 +38,12 @@ class ColorScheme:
     def __set_alpha(self):
        for color in NColorScheme:
             setattr(self.color_scheme, color, [self.add_alpha_to_hex(i) for i in getattr(self.color_scheme, color)])
+
+
+    @staticmethod
+    def get_random_color_from_adobe():
+        url = 'https://color.adobe.com/zh/create/color-wheel'
+        r = requests.get(url)
+        soup = BeautifulSoup(r.text, 'html.parser')
+        color = soup.find_all('div', class_='color-hex')
+        return color[0].text, color[1].text, color[2].text, color[3].text, color[4].text, color[5].text
