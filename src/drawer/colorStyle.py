@@ -3,6 +3,7 @@ import requests
 from dataclasses import dataclass
 from typing import *
 import random
+import os
 
 
 NColorScheme = ['NPG', 'AAAS', 'NEJM', 'LANCET', 'JAMA', 'JCO', 'UCSCGB', 'D3', 'LOCUSZOOM', 'IGV']
@@ -55,3 +56,16 @@ class ColorScheme:
             color_list.append([i['bg'], i['bgFocus'], i['primaryClear'], i['primaryDull'], i['primaryVisible'], i['accentClear'], i['accentDull'], i['clear'], i['dull'], i['duller']])
             
         return random.choice(color_list)
+
+
+    @staticmethod
+    def generate_color_scheme_from_image(img: str) -> list:
+        # 从图片中提取颜色
+        import colorgram
+        
+        colors = colorgram.extract(img, 10)
+        color_list = list()
+        for color in colors:
+            color_list.append(color.rgb.hex)
+        
+        return color_list
