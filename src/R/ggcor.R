@@ -49,3 +49,35 @@ quickcor(varechem, type = "upper") +
                                override.aes = list(size = 3), 
                                order = 1),
          fill = guide_colorbar(title = "Pearson's r", order = 3))
+
+
+
+# 环形图
+rand_correlate(100, 8) %>% ## require ambient packages
+  quickcor(circular = TRUE, cluster = TRUE, open = 45) +
+  geom_colour(colour = "white", size = 0.125) +
+  anno_row_tree() +
+  anno_col_tree() +
+  set_p_xaxis() +
+  set_p_yaxis()
+#> Warning: Removed 8 rows containing missing values (geom_text).
+
+
+# 一般热力图
+d1 <- rand_dataset(20, 30) %>% 
+  gcor_tbl(cluster = TRUE)
+p <- matrix(sample(LETTERS[1:4], 90, replace = TRUE), nrow = 30,
+             dimnames = list(paste0("sample", 1:30), paste0("Type", 1:3))) %>% 
+  gcor_tbl(name = "Type", row.order = d1) %>% 
+  qheatmap(aes(fill = Type)) + coord_fixed() + remove_y_axis()
+d2 <- data.frame(x = sample(paste0("var", 1:20), 200, replace = TRUE))
+
+set_scale()
+quickcor(d1) +
+  geom_colour(aes(fill = value)) +
+  anno_hc_bar(width = 1) +
+  anno_row_custom(p) +
+  anno_row_tree() +
+  anno_hc_bar(pos = "top") +
+  anno_bar(d2, aes(x = x), height = 0.12) +
+  anno_col_tree(height = 0.12)
