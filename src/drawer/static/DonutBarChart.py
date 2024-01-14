@@ -13,7 +13,9 @@ class DonutBarChart:
                 r_lim: int = 20,
                 bottom: int = 10,
                 fontsize: float = 2.5,
-                linewidth: float = 0.5
+                linewidth: float = 0.5,
+                graphic: bool = True,
+                inside: bool = True
                 ) -> None:
         '''
         :param names: list of names of the data
@@ -28,7 +30,13 @@ class DonutBarChart:
         self.names = names
         self.groups = groups
         if group_colors is None:
-            select_colors = ['#ff706d', '#7baf06', '#01bfc5', '#cb7bf6', '#d1ba74', '#ff706d', '#7baf06', '#01bfc5', '#cb7bf6', '#d1ba74']
+            import sys
+            sys.path.insert(0, sys.path[0]+"/../")
+            from colorStyle import DefaultColorScheme
+            color_scheme = DefaultColorScheme()
+            select_colors = ['#ff706d', '#7baf06', '#01bfc5', '#cb7bf6', '#d1ba74']
+            if len(groups) > len(select_colors):
+                select_colors = color_scheme.NPG
             # 选择同样长度的颜色
             group_colors = select_colors[:len(groups)]
         
@@ -43,6 +51,8 @@ class DonutBarChart:
         self.bottom = bottom
         self.fontsize = fontsize
         self.linewidth = linewidth
+        self.graphic = graphic
+        self.inside = inside
        
 
     def patch(self) -> tuple:
@@ -112,6 +122,14 @@ class DonutBarChart:
         return s_list
 
 
+    def add_graphical(self, ax):
+        # 增加图例，每个图例的名称和颜色
+        for i in range(len(self.group_colors)):
+            ax.plot([0], [0], color=self.group_colors[i], label=self.group_names[i])
+        ax.legend(loc='upper right', fontsize=self.fontsize, frameon=False)
+        
+
+
     def render(self):
         fig = plt.figure(figsize=(8, 8), dpi=300, facecolor='white')
         ax = fig.add_subplot(projection='polar')
@@ -128,15 +146,19 @@ class DonutBarChart:
         for i in range(len(s_list)-1):
             t = np.linspace(s_list[i]+width, s_list[i+1]-width, 50)
             ax.plot(t, [self.bottom-self.scale_major*0.4]*50, linewidth=self.linewidth, color='black')
-            ax.text(s_list[i]+(s_list[i+1]-s_list[i])/2,
-                    self.bottom-self.scale_major*1.2,
-                    self.group_names[i],
-                    fontsize=self.fontsize,
-                    va='center',
-                    ha='center'
-                    )
+            if self.inside:
+                ax.text(s_list[i]+(s_list[i+1]-s_list[i])/2,
+                        self.bottom-self.scale_major*1.2,
+                        self.group_names[i],
+                        fontsize=self.fontsize,
+                        va='center',
+                        ha='center'
+                        )
 
         ax.set_rlim(0, self.bottom+self.scale_lim+self.scale_major)
+
+        if self.graphic:
+            self.add_graphical(ax)
         ax.axis('off')
 
         plt.show()
